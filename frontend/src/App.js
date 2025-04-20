@@ -1,46 +1,43 @@
+
 import React, { useState } from 'react';
+import './style.css';
 
 function App() {
-  const [form, setForm] = useState({ description: "", renovation: "", name: "", email: "", phone: "" });
-  const [response, setResponse] = useState(null);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [project, setProject] = useState('');
+  const [renovation, setRenovation] = useState('Yes');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [result, setResult] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/calculate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
+    const response = await fetch('/api/calculate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ project, renovation, name, email, phone }),
     });
-    const data = await res.json();
-    setResponse(data);
+    const data = await response.json();
+    setResult(data);
   };
 
   return (
     <div className="container">
-      <h1>SIA SMARTHOME Estimator</h1>
+      <h1 className="title">SIA SMARTHOME Estimator</h1>
       <form onSubmit={handleSubmit}>
-        <textarea name="description" placeholder="Describe your project" onChange={handleChange} required />
-        <select name="renovation" onChange={handleChange} required>
-          <option value="">Is this a renovation project?</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
+        <textarea value={project} onChange={(e) => setProject(e.target.value)} placeholder="i want to paint a house" />
+        <select value={renovation} onChange={(e) => setRenovation(e.target.value)}>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
         </select>
-        <input type="text" name="name" placeholder="Client Name" onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-        <input type="tel" name="phone" placeholder="Phone Number" onChange={handleChange} required />
+        <input type="text" placeholder="Client Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="tel" placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
         <button type="submit">Generate Estimate</button>
       </form>
-
-      {response && (
-        <div>
-          <h3>Response:</h3>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
-        </div>
-      )}
+      {result && <pre>{JSON.stringify(result, null, 2)}</pre>}
     </div>
   );
 }
